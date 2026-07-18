@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "structured-knowledge-filesystem": {
+      "command": "C:\\path\\to\\structured-knowledge-filesystem.exe",
+      "args": [
+        "--config",
+        "C:\\path\\to\\structured-knowledge-filesystem\\config.example.json"
+      ]
+    }
+  }
+}

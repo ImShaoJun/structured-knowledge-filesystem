@@ -1,82 +1,72 @@
 # Structured Knowledge Filesystem
 
-一个通过 MCP 协议把本地结构化文档交给 AI Agent 导航的知识文件系统。
+A local knowledge navigation server that exposes structured documentation to AI agents through the Model Context Protocol (MCP).
 
-当前首版提供三个只读工具：
+Structured Knowledge Filesystem is designed for documentation that already has a meaningful hierarchy, such as product docs, engineering guides, standard operating procedures, and Git-managed knowledge bases. It preserves that human-curated structure and gives an agent three focused, read-only capabilities:
 
-- `list_directory`：浏览目录；
-- `read_file`：读取文件；
-- `search`：使用 ripgrep 搜索 Markdown、MDX 和文本文件。
+- `list_directory`: browse the knowledge tree;
+- `search`: run deterministic ripgrep searches across Markdown, MDX, and text files;
+- `read_file`: read the source document after its location has been confirmed.
 
-示例数据位于 `example-knowledge/`，包含三个产品和多层业务目录：
+The intended workflow is **browse → search → read**. The agent does not need to guess paths, and the answer can include a traceable source file.
 
-- Product Alpha：订单管理、商品目录；
-- Product Beta：客户支持、身份验证；
-- Product Gamma：数据分析、数据管道。
+## Why this project
 
-可复现的评测问题和预期来源见 [`examples/evaluation.md`](examples/evaluation.md)。
+Many knowledge systems immediately flatten documents into chunks and vector indexes. This project takes a different approach when the hierarchy itself carries meaning:
 
-## 开发环境
+- no database or vector index is required;
+- documents remain local and are not uploaded by the server;
+- search results include repository-relative paths, line numbers, and snippets;
+- the server is a small Go binary with a narrow read-only surface;
+- the same workflow works with a local Git checkout or a curated documentation folder.
 
-需要安装：
+## Example knowledge base
 
-- Go 1.23 或更高版本；
-- ripgrep，并确保 `rg` 在 PATH 中；
-- 一个支持 MCP 的客户端。
+The repository includes `example-knowledge/`, a multi-level Markdown knowledge base containing three fictional products:
 
-MCP Go SDK 会通过 Go Modules 自动下载，不需要单独安装。
+- Product Alpha: order management and product catalog;
+- Product Beta: customer support and identity verification;
+- Product Gamma: analytics and data pipelines.
 
-## 运行
+Reusable evaluation questions and expected source files are in [`examples/evaluation.md`](examples/evaluation.md). The complete MCP client setup and tool-call walkthrough are in [`examples/mcp-usage.md`](examples/mcp-usage.md).
+
+## Requirements
+
+- Go 1.23 or later for development;
+- [ripgrep](https://github.com/BurntSushi/ripgrep) available as `rg` on `PATH`;
+- an MCP client such as Cursor, Claude Desktop, or another stdio-compatible client.
+
+The MCP Go SDK is downloaded automatically through Go Modules.
+
+## Run locally
+
+Run directly from the repository:
 
 ```powershell
-go mod tidy
 go run .\cmd\structured-knowledge-filesystem --root C:\path\to\knowledge
 ```
 
-或者使用配置文件：
+Or use a JSON configuration file:
 
 ```powershell
 go run .\cmd\structured-knowledge-filesystem --config .\config.example.json
 ```
 
-## 编译
+The sample configuration points to `example-knowledge/`. Relative roots in a configuration file are resolved relative to the configuration file itself.
+
+## Build
+
+Build a platform-native binary:
 
 ```powershell
 go build -o structured-knowledge-filesystem.exe .\cmd\structured-knowledge-filesystem
 ```
 
-运行时需要主程序和 `rg`。后续可以将对应平台的 ripgrep 二进制嵌入主程序，制作单文件发行版。
+At runtime, the binary still needs `rg` unless `ripgrep_path` points to a custom executable. A future release can embed platform-specific ripgrep binaries for a single-file distribution.
 
-## 测试和验证
+## MCP client configuration
 
-运行全部测试：
-
-```powershell
-go test ./...
-```
-
-推荐在提交前执行竞态检测和静态检查：
-
-```powershell
-go test -race ./...
-go vet ./...
-```
-
-手动演示可以使用示例配置：
-
-```powershell
-go run .\cmd\structured-knowledge-filesystem --config .\config.example.json
-```
-
-然后在 MCP 客户端中询问：
-
-```text
-Where is the retry policy for failed payments in Product Alpha?
-```
-
-Agent 应该先浏览 `product-alpha/order-management/`，再搜索 `PAYMENT_FAILED`，最后读取 `payment-retry.md`。
-
-## MCP 客户端配置示例
+Copy the `mcpServers` block from [`examples/mcp-client-config.json`](examples/mcp-client-config.json) into your MCP client's configuration and replace the paths with absolute paths on your machine:
 
 ```json
 {
@@ -84,12 +74,44 @@ Agent 应该先浏览 `product-alpha/order-management/`，再搜索 `PAYMENT_FAI
     "structured-knowledge-filesystem": {
       "command": "C:\\path\\to\\structured-knowledge-filesystem.exe",
       "args": [
-        "--root",
-        "C:\\path\\to\\knowledge"
+        "--config",
+        "C:\\path\\to\\structured-knowledge-filesystem\\config.example.json"
       ]
     }
   }
 }
 ```
 
-当前版本重点验证“浏览目录 → 搜索内容 → 读取文档”的最小工作流。
+MCP clients typically start the process automatically. Standard output is reserved for the MCP protocol, so startup diagnostics are written to standard error and should be inspected through the client's MCP logs.
+
+## Test and validate
+
+Run the full test suite:
+
+```powershell
+go test ./...
+```
+
+Recommended pre-release checks:
+
+```powershell
+go test -race ./...
+go vet ./...
+go build ./cmd/structured-knowledge-filesystem
+```
+
+The CI workflow runs tests, race detection, vet, and builds on Ubuntu, Windows, and macOS.
+
+## Demo question
+
+After connecting the server to an MCP client, ask:
+
+```text
+Where is the retry policy for failed payments in Product Alpha?
+```
+
+The expected behavior is to inspect `product-alpha/order-management/`, search for `PAYMENT_FAILED`, read `payment-retry.md`, and cite the source path in the answer.
+
+## Project plan
+
+The product direction, milestones, scope, and longer-term ideas are documented in [`PROJECT_PLAN.md`](PROJECT_PLAN.md).

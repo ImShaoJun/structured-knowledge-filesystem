@@ -1,63 +1,63 @@
-# 示例知识库评测用例
+# Example Knowledge Base Evaluation
 
-这些用例用于演示和回归测试，不要求 Agent 记住文件路径。推荐观察 Agent 是否遵循：
+These cases are intended for demos and regression testing. The agent should not be expected to memorize file paths. Observe whether it follows this workflow:
 
 ```text
-浏览目录 → 进入正确产品和模块 → 搜索关键词 → 读取原始文档 → 返回来源
+Browse the directory → enter the correct product and module → search a precise term → read the source document → cite the source
 ```
 
-## 用例一：支付失败重试
+## Case 1: Failed payment retries
 
-问题：`Where is the retry policy for failed payments in Product Alpha?`
+Question: `Where is the retry policy for failed payments in Product Alpha?`
 
-建议搜索词：`PAYMENT_FAILED` 或 `payment retry`
+Suggested search terms: `PAYMENT_FAILED` or `payment retry`
 
-预期来源：
+Expected source:
 
 ```text
 example-knowledge/product-alpha/order-management/payment-retry.md
 ```
 
-关键事实：最多重试三次，间隔为 1 分钟、5 分钟和 15 分钟；最终状态为 `PAYMENT_EXPIRED`。
+Key facts: the system retries at most three times, after 1, 5, and 15 minutes; the final state is `PAYMENT_EXPIRED`.
 
-## 用例二：客户支持升级
+## Case 2: Customer support escalation
 
-问题：`When should a Beta support ticket be escalated?`
+Question: `When should a Beta support ticket be escalated?`
 
-建议搜索词：`ESCALATION_REQUIRED`
+Suggested search term: `ESCALATION_REQUIRED`
 
-预期来源：
+Expected source:
 
 ```text
 example-knowledge/product-beta/customer-support/ticket-routing.md
 ```
 
-关键事实：4 小时内没有首次响应时升级；高风险账户问题需要在 30 分钟内完成身份确认。
+Key facts: a ticket is escalated if it has no first response within 4 hours; high-risk account issues require identity verification within 30 minutes.
 
-## 用例三：报表导出超时
+## Case 3: Report export timeout
 
-问题：`What happens when a Gamma report export times out?`
+Question: `What happens when a Gamma report export times out?`
 
-建议搜索词：`REPORT_EXPORT_TIMEOUT`
+Suggested search term: `REPORT_EXPORT_TIMEOUT`
 
-预期来源：
+Expected source:
 
 ```text
 example-knowledge/product-gamma/analytics/report-export.md
 ```
 
-关键事实：任务进入 `REPORT_EXPORT_TIMEOUT`，保留任务日志但不会自动重复执行大查询。
+Key facts: the task enters `REPORT_EXPORT_TIMEOUT`, task logs are retained, and the system does not automatically rerun the expensive query.
 
-## 用例四：相似关键词消歧
+## Case 4: Similar-term disambiguation
 
-问题：`Which product handles duplicate events during ingestion replay?`
+Question: `Which product handles duplicate events during ingestion replay?`
 
-建议搜索词：`DUPLICATE_EVENT_SKIPPED`
+Suggested search term: `DUPLICATE_EVENT_SKIPPED`
 
-预期来源：
+Expected source:
 
 ```text
 example-knowledge/product-gamma/data-pipeline/ingestion-replay.md
 ```
 
-关键事实：重复事件会被跳过并记录日志，避免重复计数。
+Key facts: duplicate events are skipped and logged to prevent double counting.

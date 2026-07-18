@@ -1,17 +1,17 @@
-# Alpha / 订单管理 / 支付重试
+# Alpha / Order Management / Payment Retry
 
-## 适用范围
+## Scope
 
-本文档描述产品 Alpha 的支付失败处理流程。
+This document describes Product Alpha's failed-payment handling flow.
 
-## 状态转换
+## State transition
 
-当支付服务返回失败时，订单会记录 `PAYMENT_FAILED` 状态。系统不会立即关闭订单，而是根据重试策略进入 `PAYMENT_RETRY_PENDING`。
+When the payment service returns a failure, the order records the `PAYMENT_FAILED` state. The system does not close the order immediately; it enters `PAYMENT_RETRY_PENDING` according to the retry policy.
 
-## 重试策略
+## Retry policy
 
-后台任务最多重试三次，间隔分别为 1 分钟、5 分钟和 15 分钟。三次重试均失败后，订单进入 `PAYMENT_EXPIRED`，用户可以重新发起支付。
+The background job retries at most three times, after 1 minute, 5 minutes, and 15 minutes. If all three attempts fail, the order enters `PAYMENT_EXPIRED` and the user can start a new payment.
 
-## 观测指标
+## Observability
 
-重点关注 `payment_retry_success_rate`、`payment_expired_total` 和支付服务超时数量。
+Monitor `payment_retry_success_rate`, `payment_expired_total`, and payment-service timeout counts.

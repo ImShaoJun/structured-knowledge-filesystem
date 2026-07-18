@@ -1,6 +1,6 @@
-# Structured Knowledge Filesystem 示例知识库
+# Example Knowledge Base
 
-这是一个用于演示和评测的多产品、多层级 Markdown 知识库。
+This is a multi-product, multi-level Markdown knowledge base for demos and evaluation.
 
 ```text
 example-knowledge/
@@ -21,11 +21,11 @@ example-knowledge/
         └── ingestion-replay.md
 ```
 
-建议 Agent 按照以下顺序使用：
+The recommended agent workflow is:
 
-1. 浏览当前目录；
-2. 进入产品目录和业务模块；
-3. 在合适的目录中搜索关键词；
-4. 读取搜索结果对应的原始文档。
+1. Browse the current directory;
+2. enter the product and business-module directories;
+3. search for a precise term in the relevant scope;
+4. read the source document returned by the search.
 
-评测查询和预期结果见 `examples/evaluation.md`。
+Evaluation questions and expected results are in the repository-level `examples/evaluation.md`.

@@ -1,3 +1,3 @@
-# Beta / 客户支持
+# Beta / Customer Support
 
-客户支持模块负责接收客户工单，并根据问题类型、客户等级和服务时间进行路由。
+The customer-support module receives tickets and routes them by issue type, customer level, and service hours.

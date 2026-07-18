@@ -1,3 +1,3 @@
-# Alpha / 商品目录 / SKU 校验
+# Alpha / Product Catalog / SKU Validation
 
-创建订单前必须确认 SKU 存在、处于 `ACTIVE` 状态，并且销售区域与用户地址匹配。库存不足时返回 `SKU_STOCK_NOT_ENOUGH`，不要创建待支付订单。
+Before creating an order, confirm that the SKU exists, is in the `ACTIVE` state, and is available in the user's sales region. If inventory is insufficient, return `SKU_STOCK_NOT_ENOUGH` and do not create a pending-payment order.

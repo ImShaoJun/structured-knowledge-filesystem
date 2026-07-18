@@ -1,3 +1,3 @@
-# Beta / 身份验证 / 风险校验
+# Beta / Identity Verification / Risk Checks
 
-修改手机号、提现账户或安全设置前，需要完成二次验证。连续五次验证失败会触发 `IDENTITY_LOCKED`，后续请求必须转人工处理。
+Before changing a phone number, payout account, or security setting, complete two-factor verification. Five consecutive failures trigger `IDENTITY_LOCKED`; subsequent requests must be handled manually.

@@ -10,10 +10,12 @@ import (
 	"strings"
 )
 
+// Repository provides read-only, root-confined access to the knowledge tree.
 type Repository struct {
 	root string
 }
 
+// Entry is a file or directory returned by List.
 type Entry struct {
 	Name string `json:"name"`
 	Path string `json:"path"`
@@ -21,6 +23,7 @@ type Entry struct {
 	Size int64  `json:"size,omitempty"`
 }
 
+// NewRepository validates that root exists and points to a directory.
 func NewRepository(root string) (*Repository, error) {
 	info, err := os.Stat(root)
 	if err != nil {
@@ -32,10 +35,13 @@ func NewRepository(root string) (*Repository, error) {
 	return &Repository{root: filepath.Clean(root)}, nil
 }
 
+// Root returns the normalized absolute repository root used by search.
 func (r *Repository) Root() string {
 	return r.root
 }
 
+// List returns the immediate children of a repository-relative directory.
+// Directories are sorted before files to encourage hierarchical exploration.
 func (r *Repository) List(ctx context.Context, relativePath string) ([]Entry, error) {
 	if err := ctxErr(ctx); err != nil {
 		return nil, err
@@ -80,6 +86,7 @@ func (r *Repository) List(ctx context.Context, relativePath string) ([]Entry, er
 	return entries, nil
 }
 
+// Read returns the complete contents of one repository-relative file.
 func (r *Repository) Read(ctx context.Context, relativePath string) (string, error) {
 	if err := ctxErr(ctx); err != nil {
 		return "", err
@@ -102,6 +109,8 @@ func (r *Repository) Read(ctx context.Context, relativePath string) (string, err
 	return string(data), nil
 }
 
+// resolve converts a repository-relative path to an OS path while rejecting
+// absolute paths and traversal outside the configured root.
 func (r *Repository) resolve(relativePath string) (string, error) {
 	if relativePath == "" || relativePath == "." {
 		return r.root, nil
@@ -117,6 +126,7 @@ func (r *Repository) resolve(relativePath string) (string, error) {
 	return path, nil
 }
 
+// ctxErr keeps filesystem operations responsive to canceled MCP requests.
 func ctxErr(ctx context.Context) error {
 	select {
 	case <-ctx.Done():

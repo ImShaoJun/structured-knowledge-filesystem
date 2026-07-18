@@ -64,3 +64,15 @@ func TestRipgrepSearcherReturnsEmptyForNoMatch(t *testing.T) {
 		t.Fatalf("got results for missing query: %#v", results)
 	}
 }
+
+func TestRipgrepSearcherRejectsPathOutsideRoot(t *testing.T) {
+	rgPath, err := exec.LookPath("rg")
+	if err != nil {
+		t.Skip("ripgrep is not installed")
+	}
+
+	root := t.TempDir()
+	if _, err := NewRipgrepSearcher(rgPath).Search(context.Background(), root, "secret", "../outside"); err == nil {
+		t.Fatal("expected search path escape error")
+	}
+}

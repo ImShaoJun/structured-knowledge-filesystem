@@ -1,3 +1,3 @@
-# Gamma / 数据管道
+# Gamma / Data Pipeline
 
-数据管道模块负责从事件源摄取数据，并提供失败批次的重放能力。
+The data-pipeline module ingests events and provides replay for failed batches.

@@ -1,13 +1,13 @@
-# Beta / 客户支持 / 工单路由
+# Beta / Customer Support / Ticket Routing
 
-## 路由规则
+## Routing rules
 
-新工单首先根据 `intent` 分类。账单、支付和退款问题进入 Billing 队列；技术故障进入 Technical Support 队列；VIP 客户进入 Priority 队列。
+New tickets are first classified by `intent`. Billing, payment, and refund issues go to the Billing queue; technical failures go to Technical Support; VIP customers go to the Priority queue.
 
-## 升级策略
+## Escalation policy
 
-如果工单在 4 小时内没有首次响应，则设置 `ESCALATION_REQUIRED` 标记并通知值班主管。高风险账户问题必须在 30 分钟内完成身份确认。
+If a ticket has no first response within 4 hours, set the `ESCALATION_REQUIRED` flag and notify the on-call supervisor. High-risk account issues require identity verification within 30 minutes.
 
-## 自动回复
+## Automated replies
 
-自动回复只能确认工单已创建，不能承诺具体解决时间，也不能直接修改客户账户信息。
+An automated reply may only confirm that the ticket was created. It must not promise a specific resolution time or modify customer account information directly.

@@ -1,13 +1,13 @@
-# Gamma / 数据分析 / 报表导出
+# Gamma / Analytics / Report Export
 
-## 导出流程
+## Export flow
 
-报表导出采用异步任务。请求创建成功后返回 `EXPORT_PENDING`，任务完成后生成短期有效的下载地址。
+Report exports run as asynchronous jobs. A successful request returns `EXPORT_PENDING`; when the job completes, it generates a short-lived download URL.
 
-## 超时处理
+## Timeout handling
 
-如果上游查询超过 120 秒，导出任务进入 `REPORT_EXPORT_TIMEOUT`。系统保留任务日志，但不会自动重复执行大查询；用户可以缩小时间范围后重新提交。
+If the upstream query exceeds 120 seconds, the export enters `REPORT_EXPORT_TIMEOUT`. The system retains the job log but does not automatically rerun the expensive query; the user can narrow the time range and submit again.
 
-## 格式限制
+## Format limits
 
-CSV 导出支持最多 100 万行，XLSX 导出支持最多 20 万行。超过限制时返回 `EXPORT_ROW_LIMIT_EXCEEDED`。
+CSV exports support up to 1 million rows, while XLSX exports support up to 200,000 rows. Exceeding a limit returns `EXPORT_ROW_LIMIT_EXCEEDED`.

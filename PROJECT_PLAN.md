@@ -1,213 +1,172 @@
-# Structured Knowledge Filesystem 项目计划
+# Structured Knowledge Filesystem: Project Plan
 
-## 1. 项目定位
+## 1. Product positioning
 
-Structured Knowledge Filesystem 是一个基于 MCP 协议的本地知识导航服务器，专为具有明确目录层级的 Markdown、Git 文档和团队知识库设计。
+Structured Knowledge Filesystem is a local knowledge navigation server based on the Model Context Protocol. It is designed for Markdown, Git-managed documentation, and team knowledge bases that already have a clear directory hierarchy.
 
-项目不试图把所有资料转换成向量，而是保留人类已经整理好的知识结构，让 AI Agent 通过目录浏览、精确搜索和上下文阅读逐步定位信息。
+Instead of converting every document into vectors, the project preserves the structure created by people and lets an AI agent navigate it through directory browsing, exact text search, and source reading.
 
-一句话描述：
+> Keep the knowledge structure intact and let the agent find information the way its authors organized it.
 
-> 不改变知识库结构，让 AI Agent 按照人类整理好的方式寻找知识。
+## 2. Problem statement
 
-## 2. 要解决的问题
+Traditional file tools often provide only basic file access. An agent must guess paths, miss directory context, or open the wrong document. Retrieval-augmented generation systems can also flatten documents that already contain useful product, module, and feature boundaries, while adding indexing, synchronization, and maintenance costs.
 
-传统文件工具通常只能提供简单的文件读写能力，Agent 需要猜测路径，容易遗漏目录上下文或读取错误文档。传统 RAG 在面对已经具有产品、模块、功能等层级的文档时，又可能打散原有结构，增加索引、同步和维护成本。
+This project sits between direct file access and a vector knowledge base:
 
-本项目希望提供一个介于“直接访问文件”和“向量知识库”之间的方案：
+- preserve the existing directory and document organization;
+- let the agent browse first, search second, and read third;
+- return traceable paths, line numbers, and matching snippets;
+- keep the default deployment local so documents stay in the user's environment;
+- avoid a database, vector index, or synchronization service.
 
-- 保留原有目录和文档组织方式；
-- 让 Agent 可以先探索，再搜索，最后读取；
-- 返回可追溯的文件路径、章节和行号；
-- 默认在本地运行，文档不离开用户环境；
-- 不要求用户建设数据库、向量索引或同步服务。
+## 3. Target users
 
-## 3. 目标用户
+The first audience is not every knowledge-base user. It is specifically:
 
-首要用户不是所有知识库用户，而是以下人群：
+- teams that manage product, engineering, and architecture docs with Markdown or Git;
+- teams that maintain multi-level SOPs, runbooks, and operational guides;
+- developers who want local knowledge in Cursor, Claude Desktop, or another MCP client;
+- users who need document privacy, internal deployment, and verifiable sources.
 
-- 使用 Markdown 或 Git 管理产品、研发和架构文档的团队；
-- 维护多层目录 SOP、运维手册和业务规范的团队；
-- 希望在 Cursor、Claude Desktop 等 MCP 客户端中使用本地知识的开发者；
-- 对文档隐私、内网部署和可追溯性有要求的用户。
+## 4. Current MVP
 
-## 4. MVP 范围
+The current version provides:
 
-### 4.1 必须具备
+- a local MCP server over stdio;
+- one configured knowledge root per server process;
+- directory listing with stable, hierarchy-friendly ordering;
+- read-only file access;
+- exact and regular-expression search powered by ripgrep;
+- repository-relative paths, line numbers, columns, and matching text;
+- lexical path traversal protection for listing, reading, and searching;
+- a cross-platform CI workflow and a runnable sample knowledge base.
 
-- 通过 MCP 提供本地知识库访问能力；
-- 支持配置一个或多个知识库根目录；
-- 按目录列出文件和子目录；
-- 读取文件或指定章节；
-- 在指定目录内进行精确文本搜索；
-- 返回搜索结果的文件路径、行号和匹配片段；
-- 防止路径穿越、越权访问和符号链接逃逸；
-- 对大文件、搜索范围和执行时间进行限制；
-- 提供 Windows、macOS、Linux 的运行说明；
-- 提供一个可直接体验的示例知识库。
-
-### 4.2 第一阶段暂不做
-
-- 向量数据库和语义检索；
-- 在线托管服务和用户账号体系；
-- 文档编辑、写入和删除；
-- 自动同步 Notion、网盘、数据库等外部来源；
-- 复杂的权限管理平台；
-- 追求覆盖所有格式的通用文档解析器。
-
-## 5. 核心能力设计
-
-### 5.1 知识库配置
-
-通过配置文件声明知识库名称、根目录和可选描述。例如：
-
-```yaml
-knowledge_bases:
-  - name: product-docs
-    root: ./docs/product
-    description: 产品研发文档
-```
-
-### 5.2 目录导航
-
-Agent 可以从知识库根目录开始逐层探索。目录响应可以包含：
-
-- 当前目录路径；
-- 子目录和文件列表；
-- README 或目录说明摘要；
-- 文件类型、大小和修改时间等安全元数据；
-- 当前目录在知识库中的相对位置。
-
-### 5.3 精确搜索
-
-搜索优先采用 ripgrep 或等效的高性能文本搜索实现，支持：
-
-- 关键词搜索；
-- 正则表达式搜索；
-- 指定知识库或目录范围；
-- 文件类型过滤；
-- 行号和上下文行返回。
-
-### 5.4 内容阅读
-
-阅读工具支持按文件和章节获取内容。对于过大的文件，应引导 Agent 先搜索或按章节读取，避免一次性返回无关内容。
-
-### 5.5 Agent 使用引导
-
-通过 MCP 的工具描述、服务初始化说明或可选 Prompt，明确推荐以下工作流：
+The recommended agent workflow is:
 
 ```text
-选择知识库 → 浏览目录 → 搜索关键词 → 阅读相关章节 → 返回来源
+Browse the root → enter the relevant product and module → search a precise term → read the source file → cite the path
 ```
 
-引导内容应帮助 Agent 正确使用工具，但不能把 Prompt 当作安全边界；真正的访问控制必须由服务端实现。
+## 5. Explicitly out of scope for the MVP
 
-## 6. 建议技术路线
+- vector databases and semantic retrieval;
+- hosted services, accounts, or a user-management platform;
+- document editing, writing, or deletion;
+- automatic synchronization from Notion, cloud drives, or databases;
+- complex enterprise permission management;
+- a universal parser for every document format;
+- multi-root management inside one server process;
+- prompt templates as a security boundary.
 
-首个版本优先选择 Go 实现，原因是便于生成单文件可执行程序、跨平台发布，并适合处理文件系统和并发搜索。
+The server is read-only, but client prompt instructions are not an access-control mechanism. All path restrictions must remain enforced by the server.
 
-建议分层：
+## 6. Technical direction
+
+The first version uses Go because it produces small platform-native binaries, supports Windows, macOS, and Linux, and is well suited to filesystem operations and process-based search.
 
 ```text
-MCP 协议层
-    ↓
-知识库配置与访问控制层
-    ↓
-目录导航、内容读取、精确搜索层
-    ↓
-本地文件系统 / Git 工作区
+MCP protocol layer
+        ↓
+Configuration and root-boundary layer
+        ↓
+Directory navigation, file reading, and exact search
+        ↓
+Local filesystem or Git working tree
 ```
 
-实现原则：
+Implementation principles:
 
-- 只开放配置的根目录；
-- 所有路径先规范化，再验证是否位于允许根目录内；
-- 默认只读；
-- 搜索和读取均设置大小、深度、超时和结果数量限制；
-- 不默认收集文档内容、用户身份或使用遥测；
-- 核心逻辑与 MCP 传输层解耦，便于未来支持更多运行方式。
+- expose only the configured knowledge root;
+- normalize and validate every repository-relative path;
+- keep the server read-only by default;
+- use a small tool surface that is easy for an agent to understand;
+- return stable structured output instead of untraceable generated summaries;
+- avoid collecting document content, user identity, or telemetry by default;
+- keep the core filesystem and search logic separate from the MCP transport.
 
-## 7. 里程碑
+## 7. Roadmap
 
-### 阶段一：项目骨架
+### Phase 1: Project foundation
 
-- 初始化 Go 模块和目录结构；
-- 接入 MCP SDK；
-- 完成配置文件解析；
-- 实现本地知识库根目录校验；
-- 加入基础日志和错误处理。
+- initialize the Go module and package structure;
+- integrate the MCP SDK;
+- parse configuration files;
+- validate the configured knowledge root;
+- add basic logging and error handling.
 
-完成标准：服务可以启动，并能安全识别配置的知识库。
+Status: complete.
 
-### 阶段二：最小工具集
+### Phase 2: Minimal tool set
 
-- 实现目录浏览；
-- 实现文件读取；
-- 实现精确搜索；
-- 返回统一、稳定、适合 Agent 消费的结构化结果；
-- 增加路径越权和大文件测试。
+- implement directory browsing;
+- implement file reading;
+- implement exact text search;
+- return stable, structured results suitable for agents;
+- add path-boundary and search regression tests.
 
-完成标准：Agent 可以完成“浏览目录、搜索内容、读取文档”的完整流程。
+Status: complete for the current MVP.
 
-### 阶段三：知识导航体验
+### Phase 3: Navigation experience
 
-- 增加 README 或目录摘要提示；
-- 增加章节级读取；
-- 完善工具描述和使用引导；
-- 增加路径、行号和上下文信息；
-- 使用真实的多层级示例知识库验证导航效果。
+- add README or directory-summary hints;
+- add section-level reading;
+- improve tool descriptions and optional MCP prompts;
+- return richer context around matches;
+- evaluate navigation behavior with real, multi-level knowledge bases.
 
-完成标准：陌生用户不看源码，只阅读快速开始文档，就能完成一次有效查询。
+Status: planned.
 
-### 阶段四：可发布版本
+### Phase 4: Release quality
 
-- 发布 Windows、macOS、Linux 预编译版本；
-- 编写完整 README、配置说明和安全说明；
-- 增加 CI、单元测试和集成测试；
-- 准备 CHANGELOG 和版本号规则；
-- 发布首个公开版本。
+- publish prebuilt Windows, macOS, and Linux binaries;
+- document installation, configuration, and security behavior;
+- expand CI with integration and packaging checks;
+- define changelog and versioning conventions;
+- prepare the first public release.
 
-完成标准：用户可以在 5 分钟内安装、配置并运行示例。
+Status: in progress.
 
-### 阶段五：生态分发
+### Phase 5: Ecosystem distribution
 
-- 发布 GitHub Release；
-- 提交 MCP Registry 元数据；
-- 评估 Smithery 等本地 MCP 分发渠道；
-- 收集真实用户反馈；
-- 根据使用数据决定是否支持更多文件来源或远程部署。
+- publish GitHub Releases;
+- evaluate MCP Registry metadata;
+- assess local MCP distribution channels;
+- collect feedback from real knowledge-base users;
+- decide whether additional file sources or remote read-only deployment are justified.
 
-## 8. 验收场景
+Status: planned.
 
-首个版本至少验证以下场景：
+## 8. Acceptance scenarios
 
-1. 用户询问某个产品功能，Agent 先定位产品目录，再读取功能文档；
-2. 用户询问某个错误码，Agent 在指定模块内搜索并返回文件路径和行号；
-3. 用户同时挂载多个知识库，Agent 能区分不同知识库的来源；
-4. 用户尝试访问知识库根目录之外的文件，服务拒绝请求；
-5. 用户面对大型文档时，Agent 能通过搜索或章节读取避免一次性读取全部内容。
+The first release should validate at least these scenarios:
 
-## 9. 项目成功标准
+1. A user asks about a product feature, and the agent identifies the product directory before reading the feature document.
+2. A user asks about an error code, and the agent searches the relevant module and returns the file path and line number.
+3. A user runs separate server instances for separate knowledge roots and can distinguish their sources.
+4. A user attempts to access a path outside the configured root, and the server rejects the request.
+5. A user asks about a large document, and the agent uses search or future section-level reading instead of blindly reading unrelated content.
 
-项目早期不以支持多少文件格式或部署多少服务器为主要指标，而以以下结果为准：
+## 9. Success criteria
 
-- 新用户能够独立完成安装和配置；
-- Agent 能够稳定遵循“浏览—搜索—阅读”的工作流；
-- 返回内容具有明确来源，用户可以快速核验；
-- 用户无需改变现有知识库结构即可接入；
-- 本地文档默认不上传、不写入、不产生额外索引服务；
-- 至少有几个真实团队使用自己的知识库完成日常查询。
+Early success is not measured by the number of supported file formats or deployed servers. It is measured by whether:
 
-## 10. 项目边界与长期方向
+- a new user can install and configure the server independently;
+- an agent consistently follows the browse-search-read workflow;
+- every answer has a source that a user can quickly verify;
+- users can connect existing documentation without reorganizing it;
+- local documents are not uploaded or indexed by an additional service by default;
+- real teams can answer routine questions from their own knowledge bases.
 
-本项目的核心不是成为一个覆盖所有数据源的企业知识平台，而是把“已经被人类整理好的结构化知识”以更适合 Agent 的方式暴露出来。
+## 10. Long-term direction
 
-未来可以考虑：
+Once the MVP navigation experience is stable, possible extensions include:
 
-- Git 分支、提交版本和文档历史感知；
-- 更丰富的章节、标题和链接解析；
-- 可选的远程只读知识库服务；
-- 更多本地文件格式；
-- 面向团队的权限和配置管理。
+- Git branch, commit, and document-history awareness;
+- richer heading, section, and Markdown-link parsing;
+- optional remote read-only knowledge services;
+- more local document formats;
+- team-level permissions and configuration management;
+- optional packaged ripgrep binaries for single-file distribution.
 
-这些能力必须建立在 MVP 的导航体验稳定之后，而不是在首个版本同时引入。
+These capabilities should follow a reliable navigation experience rather than being introduced all at once.

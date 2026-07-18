@@ -1,3 +1,3 @@
-# Beta / 身份验证
+# Beta / Identity Verification
 
-身份验证模块负责确认客户身份，并为高风险操作提供额外保护。
+The identity module verifies customers and adds protection for high-risk operations.

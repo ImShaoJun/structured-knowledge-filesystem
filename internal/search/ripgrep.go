@@ -12,10 +12,13 @@ import (
 	"strings"
 )
 
+// Searcher abstracts text search so the MCP layer can be tested independently
+// from the concrete ripgrep process.
 type Searcher interface {
 	Search(ctx context.Context, root, query, relativePath string) ([]Match, error)
 }
 
+// Match is a single text match returned to an MCP client.
 type Match struct {
 	Path   string `json:"path"`
 	Line   int    `json:"line"`
@@ -23,10 +26,13 @@ type Match struct {
 	Text   string `json:"text"`
 }
 
+// RipgrepSearcher invokes ripgrep with machine-readable JSON output.
 type RipgrepSearcher struct {
 	executable string
 }
 
+// NewRipgrepSearcher creates a searcher using executable when provided, or
+// "rg" so the binary can rely on the user's PATH by default.
 func NewRipgrepSearcher(executable string) *RipgrepSearcher {
 	if executable == "" {
 		executable = "rg"
@@ -34,10 +40,12 @@ func NewRipgrepSearcher(executable string) *RipgrepSearcher {
 	return &RipgrepSearcher{executable: executable}
 }
 
+// Search searches Markdown, MDX, and plain-text files under relativePath.
+// Ripgrep's exit code 1 means "no matches" and is therefore treated as success.
 func (s *RipgrepSearcher) Search(ctx context.Context, root, query, relativePath string) ([]Match, error) {
-	target := root
-	if relativePath != "" && relativePath != "." {
-		target = filepath.Join(root, relativePath)
+	target, err := resolveTarget(root, relativePath)
+	if err != nil {
+		return nil, err
 	}
 
 	cmd := exec.CommandContext(
@@ -73,6 +81,24 @@ func (s *RipgrepSearcher) Search(ctx context.Context, root, query, relativePath 
 	return parseResults(root, &stdout)
 }
 
+// resolveTarget keeps the search scope inside root before spawning ripgrep.
+// This mirrors the repository path checks used by list and read operations.
+func resolveTarget(root, relativePath string) (string, error) {
+	if relativePath == "" || relativePath == "." {
+		return root, nil
+	}
+	if filepath.IsAbs(relativePath) {
+		return "", errors.New("search path must be repository-relative")
+	}
+
+	target := filepath.Clean(filepath.Join(root, relativePath))
+	relative, err := filepath.Rel(root, target)
+	if err != nil || relative == ".." || strings.HasPrefix(relative, ".."+string(filepath.Separator)) {
+		return "", errors.New("search path escapes the knowledge root")
+	}
+	return target, nil
+}
+
 type rgMessage struct {
 	Type string `json:"type"`
 	Data struct {
@@ -89,6 +115,8 @@ type rgMessage struct {
 	} `json:"data"`
 }
 
+// parseResults converts ripgrep's JSON event stream into stable repository-
+// relative matches and ignores non-match events such as summaries.
 func parseResults(root string, output *bytes.Buffer) ([]Match, error) {
 	results := make([]Match, 0)
 	scanner := bufio.NewScanner(output)

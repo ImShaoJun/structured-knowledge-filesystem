@@ -1,3 +1,3 @@
-# Gamma / 数据分析
+# Gamma / Analytics
 
-数据分析模块提供报表查询、指标聚合和异步导出能力。
+The analytics module provides report queries, metric aggregation, and asynchronous exports.

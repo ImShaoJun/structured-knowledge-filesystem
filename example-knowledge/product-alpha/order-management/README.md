@@ -1,7 +1,7 @@
-# Alpha / 订单管理
+# Alpha / Order Management
 
-订单管理负责订单创建、支付状态同步和失败重试。
+Order management handles order creation, payment-state synchronization, and failed-payment retries.
 
-## 相关文档
+## Related documents
 
-- `payment-retry.md`：支付失败后的重试策略和状态机。
+- `payment-retry.md`: retry policy and state machine for failed payments.

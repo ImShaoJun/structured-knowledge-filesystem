@@ -1,5 +1,5 @@
-# Gamma / 数据管道 / 摄取重放
+# Gamma / Data Pipeline / Ingestion Replay
 
-失败批次会记录 `INGESTION_BATCH_FAILED` 事件。数据工程师确认源数据没有重复写入后，可以按照批次 ID 执行重放。
+Failed batches record an `INGESTION_BATCH_FAILED` event. After confirming that the source data was not written twice, a data engineer can replay the batch by ID.
 
-重放任务默认只允许执行一次。若目标表已经存在相同事件 ID，系统跳过该事件并记录 `DUPLICATE_EVENT_SKIPPED`，避免重复计数。
+Replay jobs are allowed only once by default. If the destination table already contains the same event ID, the system skips the event and records `DUPLICATE_EVENT_SKIPPED` to prevent double counting.

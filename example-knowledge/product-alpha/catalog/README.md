@@ -1,3 +1,3 @@
-# Alpha / 商品目录
+# Alpha / Product Catalog
 
-商品目录负责维护商品和 SKU 的基础信息，并在订单创建前执行商品状态校验。
+The product catalog maintains product and SKU metadata and validates product state before an order is created.
