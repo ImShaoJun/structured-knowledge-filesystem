@@ -12,8 +12,8 @@ import (
 	"strings"
 )
 
-// Searcher abstracts text search so the MCP layer can be tested independently
-// from the concrete ripgrep process.
+// Searcher abstracts text search so the MCP layer can use either the built-in
+// backend or the optional ripgrep process.
 type Searcher interface {
 	Search(ctx context.Context, root, query, relativePath string) ([]Match, error)
 }

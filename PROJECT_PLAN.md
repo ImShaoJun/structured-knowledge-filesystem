@@ -37,7 +37,8 @@ The current version provides:
 - one configured knowledge root per server process;
 - directory listing with stable, hierarchy-friendly ordering;
 - read-only file access;
-- exact and regular-expression search powered by ripgrep;
+- exact and regular-expression search powered by the built-in Go backend;
+- optional ripgrep acceleration for larger repositories;
 - repository-relative paths, line numbers, columns, and matching text;
 - lexical path traversal protection for listing, reading, and searching;
 - a cross-platform CI workflow and a runnable sample knowledge base.
@@ -63,7 +64,7 @@ The server is read-only, but client prompt instructions are not an access-contro
 
 ## 6. Technical direction
 
-The first version uses Go because it produces small platform-native binaries, supports Windows, macOS, and Linux, and is well suited to filesystem operations and process-based search.
+The first version uses Go because it produces small platform-native binaries, supports Windows, macOS, and Linux, and is well suited to filesystem operations and in-process text search.
 
 ```text
 MCP protocol layer

@@ -36,7 +36,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	searcher := search.NewRipgrepSearcher(cfg.RipgrepPath)
+	searcher := search.NewSearcher(cfg.RipgrepPath)
 	s := server.NewMCPServer(
 		"Structured Knowledge Filesystem",
 		"0.1.0",
@@ -71,11 +71,12 @@ func readFileTool() mcp.Tool {
 	)
 }
 
-// searchTool describes the ripgrep-backed text search tool.
+// searchTool describes the built-in search tool and its optional ripgrep
+// acceleration backend.
 func searchTool() mcp.Tool {
 	return mcp.NewTool(
 		"search",
-		mcp.WithDescription("Search the knowledge repository with ripgrep and return matching file paths, line numbers, and snippets."),
+		mcp.WithDescription("Search the knowledge repository and return matching file paths, line numbers, and snippets. Uses the built-in backend unless ripgrep is configured."),
 		mcp.WithString("query", mcp.Required(), mcp.Description("Text or regular expression to search for.")),
 		mcp.WithString("path", mcp.Description("Repository-relative directory or file path. Use . when omitted.")),
 	)

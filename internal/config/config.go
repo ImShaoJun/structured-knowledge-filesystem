@@ -8,8 +8,8 @@ import (
 	"path/filepath"
 )
 
-// Config contains the filesystem root and the optional ripgrep executable path
-// used by the MCP server.
+// Config contains the filesystem root and an optional ripgrep executable path.
+// When omitted, the MCP server uses its built-in search backend.
 type Config struct {
 	Root        string `json:"root"`
 	RipgrepPath string `json:"ripgrep_path,omitempty"`

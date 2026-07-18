@@ -1,4 +1,3 @@
 {
-  "root": "./example-knowledge",
-  "ripgrep_path": "rg"
+  "root": "./example-knowledge"
 }

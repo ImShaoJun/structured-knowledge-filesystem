@@ -5,7 +5,7 @@ A local knowledge navigation server that exposes structured documentation to AI 
 Structured Knowledge Filesystem is designed for documentation that already has a meaningful hierarchy, such as product docs, engineering guides, standard operating procedures, and Git-managed knowledge bases. It preserves that human-curated structure and gives an agent three focused, read-only capabilities:
 
 - `list_directory`: browse the knowledge tree;
-- `search`: run deterministic ripgrep searches across Markdown, MDX, and text files;
+- `search`: run deterministic searches across Markdown, MDX, and text files;
 - `read_file`: read the source document after its location has been confirmed.
 
 The intended workflow is **browse → search → read**. The agent does not need to guess paths, and the answer can include a traceable source file.
@@ -33,23 +33,22 @@ Reusable evaluation questions and expected source files are in [`examples/evalua
 ## Requirements
 
 - Go 1.23 or later for development;
-- [ripgrep](https://github.com/BurntSushi/ripgrep) available as `rg` on `PATH`;
 - an MCP client such as Cursor, Claude Desktop, or another stdio-compatible client.
 
-The MCP Go SDK is downloaded automatically through Go Modules.
+The MCP Go SDK is downloaded automatically through Go Modules. ripgrep is optional.
 
 ## Run locally
 
 Run directly from the repository:
 
 ```powershell
-go run .cmdstructured-knowledge-filesystem --root C:path	oknowledge
+go run .\cmd\structured-knowledge-filesystem --root C:\path\to\knowledge
 ```
 
 Or use a JSON configuration file:
 
 ```powershell
-go run .cmdstructured-knowledge-filesystem --config .config.example.json
+go run .\cmd\structured-knowledge-filesystem --config .\config.example.json
 ```
 
 The sample configuration points to `example-knowledge/`. Relative roots in a configuration file are resolved relative to the configuration file itself.
@@ -59,10 +58,25 @@ The sample configuration points to `example-knowledge/`. Relative roots in a con
 Build a platform-native binary:
 
 ```powershell
-go build -o structured-knowledge-filesystem.exe .cmdstructured-knowledge-filesystem
+go build -o structured-knowledge-filesystem.exe .\cmd\structured-knowledge-filesystem
 ```
 
-At runtime, the binary still needs `rg` unless `ripgrep_path` points to a custom executable. A future release can embed platform-specific ripgrep binaries for a single-file distribution.
+The binary uses the built-in Go search backend by default, so no external search executable is required.
+
+## Search backends
+
+The built-in backend searches Markdown, MDX, and plain-text files in-process and is selected when `ripgrep_path` is omitted. It keeps the application as a single cross-platform binary.
+
+For larger repositories, optionally install ripgrep and configure its executable:
+
+```json
+{
+  "root": "./example-knowledge",
+  "ripgrep_path": "rg"
+}
+```
+
+Both backends return the same file paths, line numbers, columns, and matching text.
 
 ## MCP client configuration
 
@@ -72,10 +86,10 @@ Copy the `mcpServers` block from [`examples/mcp-client-config.json`](examples/mc
 {
   "mcpServers": {
     "structured-knowledge-filesystem": {
-      "command": "C:\path\to\structured-knowledge-filesystem.exe",
+      "command": "C:\\path\\to\\structured-knowledge-filesystem.exe",
       "args": [
         "--config",
-        "C:\path\to\structured-knowledge-filesystem\config.example.json"
+        "C:\\path\\to\\structured-knowledge-filesystem\\config.example.json"
       ]
     }
   }

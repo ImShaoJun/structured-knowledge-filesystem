@@ -14,8 +14,7 @@ Copy [`config.example.json`](../config.example.json) and point `root` to your kn
 
 ```json
 {
-  "root": "C:\\path\\to\\structured-knowledge-filesystem\\example-knowledge",
-  "ripgrep_path": "rg"
+  "root": "C:\\path\\to\\structured-knowledge-filesystem\\example-knowledge"
 }
 ```
 
@@ -40,8 +39,9 @@ MCP clients normally start these commands through `command` and `args`. Standard
 Runtime requirements:
 
 1. The Structured Knowledge Filesystem binary, or a Go development environment;
-2. `rg` (ripgrep) installed and available on `PATH`, or an absolute path configured through `ripgrep_path`;
-3. An MCP client that supports stdio connections.
+2. An MCP client that supports stdio connections.
+
+The built-in search backend requires no external executable. To opt into ripgrep, install it separately and add `"ripgrep_path": "rg"` to the JSON configuration.
 
 ## 3. Configure the MCP client
 
@@ -170,7 +170,7 @@ See [`evaluation.md`](./evaluation.md) for a fuller set of questions and expecte
 ## 7. Current boundaries
 
 - the current version provides a local stdio MCP server;
-- search depends on a locally available ripgrep executable;
+- search uses the built-in Go backend by default; ripgrep is an optional acceleration backend;
 - one server process uses one configured knowledge root;
 - the server is read-only and does not modify knowledge files;
 - `read_file` reads one complete file; section-level reading and stronger large-file protection are future improvements.
