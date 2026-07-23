@@ -253,7 +253,7 @@ def run_stdio_server(root: Path) -> int:
                 result = {
                     "protocolVersion": "2024-11-05",
                     "capabilities": {"tools": {}},
-                    "serverInfo": {"name": "structured-knowledge-filesystem", "version": "0.1.0"},
+                    "serverInfo": {"name": "structured-knowledge-filesystem", "version": "1.0.0"},
                 }
                 _write_message(sys.stdout.buffer, {"jsonrpc": "2.0", "id": msg_id, "result": result})
             elif method == "tools/list":
@@ -281,4 +281,3 @@ def run_stdio_server(root: Path) -> int:
                     },
                 )
     return 0
-

@@ -39,7 +39,7 @@ func main() {
 	searcher := search.NewSearcher(cfg.RipgrepPath)
 	s := server.NewMCPServer(
 		"Structured Knowledge Filesystem",
-		"0.1.0",
+		"1.0.0",
 		server.WithToolCapabilities(true),
 	)
 
