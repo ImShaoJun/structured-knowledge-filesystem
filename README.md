@@ -37,6 +37,12 @@ Reusable evaluation questions and expected source files are in [`examples/evalua
 
 The MCP Go SDK is downloaded automatically through Go Modules. ripgrep is optional.
 
+## Versioning and release notes
+
+This project follows semantic versioning. The first public release is `1.0.0`.
+
+Release notes are tracked in [`CHANGELOG.md`](CHANGELOG.md).
+
 ## Run locally
 
 Run directly from the repository:
